@@ -102,6 +102,7 @@ export var tns = function(options) {
     touch: true,
     mouseDrag: false,
     swipeAngle: 15,
+	swipeMinimumDistance: 5,
     nested: false,
     preventActionWhenRunning: false,
     preventScrollOnTouch: false,
@@ -2629,7 +2630,7 @@ export var tns = function(options) {
       lastPosition.y = $.clientY;
       var dist = getDist(lastPosition, initPosition);
 
-      if (Math.abs(dist)) {
+      if (Math.abs(dist) > options.swipeMinimumDistance) {
         // drag vs click
         if (!isTouchEvent(e)) {
           // prevent "click"
