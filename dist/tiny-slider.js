@@ -3544,8 +3544,6 @@ var tns = function (options) {
               } else {
                 index += indexMoved;
               }
-
-              console.log(index);
             } else {
               var moved = -(translateInit + dist);
 

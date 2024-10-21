@@ -2651,12 +2651,12 @@ export var tns = function(options) {
             if (horizontal && !autoWidth) {
               var indexMoved = - dist * items / (viewport + gutter);
               indexMoved = dist > 0 ? Math.floor(indexMoved) : Math.ceil(indexMoved);
+              
               if (textDirection === 'rtl') {
                 index += indexMoved * -1;
               } else {
-                  index += indexMoved;
+                index += indexMoved;
               }
-              console.log(index);
             } else {
               var moved = - (translateInit + dist);
               if (moved <= 0) {
