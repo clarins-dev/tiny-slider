@@ -142,3 +142,12 @@ $perpage: 3;
     }
   }
 }
+
+document,
+body {
+  &[dir='rtl'] {
+    .tns-item {
+      float: right;
+    }
+  }
+}

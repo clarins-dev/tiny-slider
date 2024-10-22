@@ -1530,8 +1530,9 @@
     return width < sm ? 150 : width >= sm && width < md ? 200 : width >= md && width < lg ? 300 : 400;
     }
     window.addEventListener('resize', function() { fw = getFW(ww); });
+    var exports = {};
     </script> 
-    <script src="../dist/min/tiny-slider.js"></script> 
+    <script src="../dist/tiny-slider.js"></script> 
     <script>
 
     // <script type="module">
