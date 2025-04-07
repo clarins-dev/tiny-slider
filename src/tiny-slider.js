@@ -263,7 +263,8 @@ export var tns = function(options) {
   if (carousel) { container.className += ' tns-vpfix'; }
 
   // fixedWidth: viewport > rightBoundary > indexMax
-  var autoWidth = options.autoWidth,
+  var textDirection = getOption('textDirection'),
+      autoWidth = options.autoWidth,
       fixedWidth = getOption('fixedWidth'),
       edgePadding = getOption('edgePadding'),
       gutter = getOption('gutter'),
@@ -279,7 +280,6 @@ export var tns = function(options) {
       autoHeight = getOption('autoHeight'),
       controls = getOption('controls'),
       controlsText = getOption('controlsText'),
-      textDirection = getOption('textDirection'),
       nav = getOption('nav'),
       touch = getOption('touch'),
       mouseDrag = getOption('mouseDrag'),
@@ -309,7 +309,7 @@ export var tns = function(options) {
         } else if (autoWidth) {
           return function() {
             for (var i = 0; i < slideCountNew; i++) {
-              if (slidePositions[i] >= - rightBoundary) { return i; }
+              if (Math.abs(slidePositions[i]) >= Math.abs(rightBoundary)) { return i; }
             }
           };
         } else {
@@ -553,7 +553,11 @@ export var tns = function(options) {
 
   function getViewportWidth () {
     var gap = edgePadding ? edgePadding * 2 - gutter : 0;
-    return getClientWidth(containerParent) - gap;
+    if (textDirection === 'ltr') {
+      return getClientWidth(containerParent) - gap;
+    } else {
+      return containerParent.getBoundingClientRect().left;
+    }
   }
 
   function hasOption (item) {
@@ -808,8 +812,13 @@ export var tns = function(options) {
       var num = loop ? index : slideCount - 1;
 
       (function stylesApplicationCheck() {
-        var left = slideItems[num].getBoundingClientRect().left;
-        var right = slideItems[num - 1].getBoundingClientRect().right;
+        if (options.textDirection === 'ltr') {
+          var left = slideItems[num].getBoundingClientRect().left;
+          var right = slideItems[num - 1].getBoundingClientRect().right;
+        } else {
+          var left = slideItems[num].getBoundingClientRect().right;
+          var right = slideItems[num - 1].getBoundingClientRect().left;
+        }
 
         (Math.abs(left - right) <= 1) ?
           initSliderTransformCore() :
@@ -2073,8 +2082,12 @@ export var tns = function(options) {
   }
 
   function getRightBoundary () {
-    var gap = edgePadding ? gutter : 0,
-        result = (viewport + gap) - getSliderWidth();
+    var gap = edgePadding ? gutter : 0
+    if (textDirection === 'ltr') {
+      var result = (viewport + gap) - getSliderWidth();
+    } else {
+      result = getSliderWidth() + container.getBoundingClientRect().left;
+    }
 
     if (center && !loop) {
       result = fixedWidth ? - (fixedWidth + gutter) * (slideCountNew - 1) - getCenterGap() :
@@ -2651,7 +2664,7 @@ export var tns = function(options) {
             if (horizontal && !autoWidth) {
               var indexMoved = - dist * items / (viewport + gutter);
               indexMoved = dist > 0 ? Math.floor(indexMoved) : Math.ceil(indexMoved);
-              
+
               if (textDirection === 'rtl') {
                 index += indexMoved * -1;
               } else {
