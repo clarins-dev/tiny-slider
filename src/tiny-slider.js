@@ -262,7 +262,7 @@ export var tns = function(options) {
   if (responsive) { setBreakpointZone(); }
   if (carousel) { container.className += ' tns-vpfix'; }
 
-  // fixedWidth: viewport > rightBoundary > indexMax0
+  // fixedWidth: viewport > rightBoundary > indexMax
   var textDirection = getOption('textDirection'),
       autoWidth = options.autoWidth,
       fixedWidth = getOption('fixedWidth'),
