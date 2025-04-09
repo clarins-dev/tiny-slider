@@ -262,7 +262,7 @@ export var tns = function(options) {
   if (responsive) { setBreakpointZone(); }
   if (carousel) { container.className += ' tns-vpfix'; }
 
-  // fixedWidth: viewport > rightBoundary > indexMax
+  // fixedWidth: viewport > rightBoundary > indexMax0
   var textDirection = getOption('textDirection'),
       autoWidth = options.autoWidth,
       fixedWidth = getOption('fixedWidth'),
@@ -1925,15 +1925,35 @@ export var tns = function(options) {
   // (init) => slidePositions
   function setSlidePositions () {
     slidePositions = [0];
-    var attr = horizontal ? 'left' : 'top',
-        attr2 = horizontal ? 'right' : 'bottom',
-        base = slideItems[0].getBoundingClientRect()[attr];
+	if (textDirection === 'ltr') {
+		var attr = horizontal ? 'left' : 'top';
+		var attr2 = horizontal ? 'right' : 'bottom';
+	} else {
+		var attr = horizontal ? 'right' : 'top';
+		var attr2 = horizontal ? 'left' : 'bottom';
+	}
+
+    var base = slideItems[0].getBoundingClientRect()[attr];
 
     forEach(slideItems, function(item, i) {
       // skip the first slide
-      if (i) { slidePositions.push(item.getBoundingClientRect()[attr] - base); }
+      if (i !== 0) {
+	    if (textDirection === 'ltr') {
+	      var pos = item.getBoundingClientRect()[attr] - base;
+		} else {
+	      pos = base - item.getBoundingClientRect()[attr];
+	    }
+	    slidePositions.push(pos);
+	  }
       // add the end edge
-      if (i === slideCountNew - 1) { slidePositions.push(item.getBoundingClientRect()[attr2] - base); }
+      if (i === slideCountNew - 1) {
+	    if (textDirection === 'ltr') {
+	      pos = item.getBoundingClientRect()[attr2] - base;
+	    } else {
+	      pos = base - item.getBoundingClientRect()[attr2];
+	    }
+	    slidePositions.push(pos);
+	  }
     });
   }
 
@@ -2086,7 +2106,7 @@ export var tns = function(options) {
     if (textDirection === 'ltr') {
       var result = (viewport + gap) - getSliderWidth();
     } else {
-      result = getSliderWidth() + container.getBoundingClientRect().left;
+      result = container.getBoundingClientRect().left - getSliderWidth();
     }
 
     if (center && !loop) {
