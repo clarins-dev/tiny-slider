@@ -1934,16 +1934,17 @@ export var tns = function(options) {
     }
 
     var base = slideItems[0].getBoundingClientRect()[attr];
+    var sign = horizontal ? -1 : 1;
 
     forEach(slideItems, function(item, i) {
       // skip the first slide
       if (i !== 0) {
-        var pos = -Math.abs(item.getBoundingClientRect()[attr] - base);
+        var pos = sign * Math.abs(item.getBoundingClientRect()[attr] - base);
         slidePositions.push(pos);
       }
       // add the end edge
       if (i === slideCountNew - 1) {
-        pos = -Math.abs(item.getBoundingClientRect()[attr2] - base);
+        pos = sign * Math.abs(item.getBoundingClientRect()[attr2] - base);
         slidePositions.push(pos);
       }
     });
@@ -2095,7 +2096,7 @@ export var tns = function(options) {
 
   function getRightBoundary () {
     var gap = edgePadding ? gutter : 0
-    if (textDirection === 'ltr') {
+    if (textDirection === 'ltr' || !horizontal) {
       var result = (viewport + gap) - getSliderWidth();
     } else {
       result = container.getBoundingClientRect().left - getSliderWidth();
