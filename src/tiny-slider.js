@@ -1925,12 +1925,12 @@ export var tns = function(options) {
   // (init) => slidePositions
   function setSlidePositions () {
     slidePositions = [0];
-	if (textDirection === 'ltr') {
-		var attr = horizontal ? 'left' : 'top';
-		var attr2 = horizontal ? 'right' : 'bottom';
-	} else {
-		var attr = horizontal ? 'right' : 'top';
-		var attr2 = horizontal ? 'left' : 'bottom';
+
+	var attr = horizontal ? 'left' : 'top';
+	var attr2 = horizontal ? 'right' : 'bottom';
+	if (textDirection !== 'ltr') {
+		attr = horizontal ? 'right' : 'top';
+		attr2 = horizontal ? 'left' : 'bottom';
 	}
 
     var base = slideItems[0].getBoundingClientRect()[attr];
@@ -1938,11 +1938,11 @@ export var tns = function(options) {
     forEach(slideItems, function(item, i) {
       // skip the first slide
       if (i !== 0) {
-	    if (textDirection === 'ltr') {
-	      var pos = item.getBoundingClientRect()[attr] - base;
-		} else {
-	      pos = base - item.getBoundingClientRect()[attr];
-	    }
+	    //if (textDirection === 'ltr') {
+	      var pos = -Math.abs(item.getBoundingClientRect()[attr] - base);
+		//} else {
+	      //pos = base - item.getBoundingClientRect()[attr];
+	    //}
 	    slidePositions.push(pos);
 	  }
       // add the end edge
