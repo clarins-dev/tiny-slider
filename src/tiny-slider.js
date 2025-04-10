@@ -102,7 +102,7 @@ export var tns = function(options) {
     touch: true,
     mouseDrag: false,
     swipeAngle: 15,
-	swipeMinimumDistance: 5,
+    swipeMinimumDistance: 5,
     nested: false,
     preventActionWhenRunning: false,
     preventScrollOnTouch: false,
@@ -1938,18 +1938,14 @@ export var tns = function(options) {
     forEach(slideItems, function(item, i) {
       // skip the first slide
       if (i !== 0) {
-	    var pos = -Math.abs(item.getBoundingClientRect()[attr] - base);
-	    slidePositions.push(pos);
-	  }
+        var pos = -Math.abs(item.getBoundingClientRect()[attr] - base);
+        slidePositions.push(pos);
+      }
       // add the end edge
       if (i === slideCountNew - 1) {
-	    if (textDirection === 'ltr') {
-	      pos = item.getBoundingClientRect()[attr2] - base;
-	    } else {
-	      pos = base - item.getBoundingClientRect()[attr2];
-	    }
-	    slidePositions.push(pos);
-	  }
+        pos = -Math.abs(item.getBoundingClientRect()[attr2] - base);
+        slidePositions.push(pos);
+      }
     });
   }
 
