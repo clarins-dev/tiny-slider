@@ -553,7 +553,7 @@ export var tns = function(options) {
 
   function getViewportWidth () {
     var gap = edgePadding ? edgePadding * 2 - gutter : 0;
-    if (textDirection === 'ltr') {
+    if (textDirection === 'ltr' || !horizontal) {
       return getClientWidth(containerParent) - gap;
     } else {
       return containerParent.getBoundingClientRect().left;
@@ -812,7 +812,7 @@ export var tns = function(options) {
       var num = loop ? index : slideCount - 1;
 
       (function stylesApplicationCheck() {
-        if (options.textDirection === 'ltr') {
+        if (options.textDirection === 'ltr' || !horizontal) {
           var left = slideItems[num].getBoundingClientRect().left;
           var right = slideItems[num - 1].getBoundingClientRect().right;
         } else {
@@ -2099,7 +2099,7 @@ export var tns = function(options) {
     if (textDirection === 'ltr' || !horizontal) {
       var result = (viewport + gap) - getSliderWidth();
     } else {
-      result = container.getBoundingClientRect().left - getSliderWidth();
+      result = container.getBoundingClientRect().left + getSliderWidth();
     }
 
     if (center && !loop) {
