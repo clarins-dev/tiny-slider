@@ -102,7 +102,7 @@ export var tns = function(options) {
     touch: true,
     mouseDrag: false,
     swipeAngle: 15,
-	swipeMinimumDistance: 5,
+    swipeMinimumDistance: 5,
     nested: false,
     preventActionWhenRunning: false,
     preventScrollOnTouch: false,
@@ -1925,15 +1925,28 @@ export var tns = function(options) {
   // (init) => slidePositions
   function setSlidePositions () {
     slidePositions = [0];
-    var attr = horizontal ? 'left' : 'top',
-        attr2 = horizontal ? 'right' : 'bottom',
-        base = slideItems[0].getBoundingClientRect()[attr];
+
+    var attr = horizontal ? 'left' : 'top';
+    var attr2 = horizontal ? 'right' : 'bottom';
+    if (textDirection !== 'ltr') {
+      attr = horizontal ? 'right' : 'top';
+      attr2 = horizontal ? 'left' : 'bottom';
+    }
+
+    var base = slideItems[0].getBoundingClientRect()[attr];
+    var sign = horizontal ? -1 : 1;
 
     forEach(slideItems, function(item, i) {
       // skip the first slide
-      if (i) { slidePositions.push(item.getBoundingClientRect()[attr] - base); }
+      if (i !== 0) {
+        var pos = sign * Math.abs(item.getBoundingClientRect()[attr] - base);
+        slidePositions.push(pos);
+      }
       // add the end edge
-      if (i === slideCountNew - 1) { slidePositions.push(item.getBoundingClientRect()[attr2] - base); }
+      if (i === slideCountNew - 1) {
+        pos = sign * Math.abs(item.getBoundingClientRect()[attr2] - base);
+        slidePositions.push(pos);
+      }
     });
   }
 
@@ -2083,10 +2096,10 @@ export var tns = function(options) {
 
   function getRightBoundary () {
     var gap = edgePadding ? gutter : 0
-    if (textDirection === 'ltr') {
+    if (textDirection === 'ltr' || !horizontal) {
       var result = (viewport + gap) - getSliderWidth();
     } else {
-      result = getSliderWidth() + container.getBoundingClientRect().left;
+      result = container.getBoundingClientRect().left - getSliderWidth();
     }
 
     if (center && !loop) {
