@@ -102,7 +102,7 @@ export var tns = function(options) {
     touch: true,
     mouseDrag: false,
     swipeAngle: 15,
-    swipeMinimumDistance: 5,
+	swipeMinimumDistance: 5,
     nested: false,
     preventActionWhenRunning: false,
     preventScrollOnTouch: false,
@@ -299,7 +299,13 @@ export var tns = function(options) {
       rightBoundary = fixedWidth ? getRightBoundary() : null,
       updateIndexBeforeTransform = (!carousel || !loop) ? true : false,
       // transform
-      transformAttr = horizontal ? 'left' : 'top',
+      transformAttr = (function() {
+        var result = 'top';
+        if (horizontal) {
+          result = textDirection === 'ltr' ? 'left' : 'right';
+        }
+        return result;
+      })(),
       transformPrefix = '',
       transformPostfix = '',
       // index
@@ -553,11 +559,7 @@ export var tns = function(options) {
 
   function getViewportWidth () {
     var gap = edgePadding ? edgePadding * 2 - gutter : 0;
-    if (textDirection === 'ltr' || !horizontal) {
-      return getClientWidth(containerParent) - gap;
-    } else {
-      return containerParent.getBoundingClientRect().left;
-    }
+    return getClientWidth(containerParent) - gap;
   }
 
   function hasOption (item) {
@@ -812,7 +814,7 @@ export var tns = function(options) {
       var num = loop ? index : slideCount - 1;
 
       (function stylesApplicationCheck() {
-        if (options.textDirection === 'ltr' || !horizontal) {
+        if (textDirection === 'ltr' || !horizontal) {
           var left = slideItems[num].getBoundingClientRect().left;
           var right = slideItems[num - 1].getBoundingClientRect().right;
         } else {
@@ -1389,8 +1391,12 @@ export var tns = function(options) {
         if (controlsContainer) {
           hideElement(controlsContainer);
         } else {
-          if (prevButton) { hideElement(prevButton); }
-          if (nextButton) { hideElement(nextButton); }
+          if (prevButton) {
+            hideElement(prevButton);
+          }
+          if (nextButton) {
+            hideElement(nextButton);
+          }
         }
       }
     }
@@ -1593,8 +1599,12 @@ export var tns = function(options) {
       if (controlsContainer) {
         hideElement(controlsContainer);
       } else {
-        if (prevButton) { hideElement(prevButton); }
-        if (nextButton) { hideElement(nextButton); }
+        if (prevButton) {
+          hideElement(prevButton);
+        }
+        if (nextButton) {
+          hideElement(nextButton);
+        }
       }
     }
   }
@@ -1606,8 +1616,12 @@ export var tns = function(options) {
       if (controlsContainer) {
         showElement(controlsContainer);
       } else {
-        if (prevButton) { showElement(prevButton); }
-        if (nextButton) { showElement(nextButton); }
+        if (prevButton) {
+          showElement(prevButton);
+        }
+        if (nextButton) {
+          showElement(nextButton);
+        }
       }
     }
   }
@@ -1925,28 +1939,20 @@ export var tns = function(options) {
   // (init) => slidePositions
   function setSlidePositions () {
     slidePositions = [0];
-
-    var attr = horizontal ? 'left' : 'top';
-    var attr2 = horizontal ? 'right' : 'bottom';
-    if (textDirection !== 'ltr') {
-      attr = horizontal ? 'right' : 'top';
+    if (textDirection === 'ltr' || !horizontal) {
+      var attr = horizontal ? 'left' : 'top';
+      var attr2 = horizontal ? 'right' : 'bottom';
+    } else {
+      attr = horizontal ? 'right' : 'top',
       attr2 = horizontal ? 'left' : 'bottom';
     }
-
     var base = slideItems[0].getBoundingClientRect()[attr];
-    var sign = horizontal ? -1 : 1;
 
     forEach(slideItems, function(item, i) {
       // skip the first slide
-      if (i !== 0) {
-        var pos = sign * Math.abs(item.getBoundingClientRect()[attr] - base);
-        slidePositions.push(pos);
-      }
+      if (i) { slidePositions.push(item.getBoundingClientRect()[attr] - base); }
       // add the end edge
-      if (i === slideCountNew - 1) {
-        pos = sign * Math.abs(item.getBoundingClientRect()[attr2] - base);
-        slidePositions.push(pos);
-      }
+      if (i === slideCountNew - 1) { slidePositions.push(item.getBoundingClientRect()[attr2] - base); }
     });
   }
 
@@ -2095,11 +2101,11 @@ export var tns = function(options) {
   }
 
   function getRightBoundary () {
-    var gap = edgePadding ? gutter : 0
-    if (textDirection === 'ltr' || !horizontal) {
+    var gap = edgePadding ? gutter : 0;
+    if (textDirection === 'ltr' || !horizontal || !autoWidth) {
       var result = (viewport + gap) - getSliderWidth();
     } else {
-      result = container.getBoundingClientRect().left + getSliderWidth();
+      result = getSliderWidth() + (viewport + gap);
     }
 
     if (center && !loop) {
