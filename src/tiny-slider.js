@@ -2572,7 +2572,8 @@ export var tns = function(options) {
   }
 
   function getMoveDirectionExpected () {
-    return getTouchDirection(toDegree(lastPosition.y - initPosition.y, lastPosition.x - initPosition.x), swipeAngle) === options.axis;
+    var touchDirection = getTouchDirection(toDegree(lastPosition.y - initPosition.y, lastPosition.x - initPosition.x), swipeAngle);
+    return touchDirection === options.axis;
   }
 
   function onPanStart (e) {
@@ -2628,7 +2629,11 @@ export var tns = function(options) {
       return;
     }
     caf(rafIndex);
-    if (panStart) { rafIndex = raf(function(){ panUpdate(e); }); }
+    if (panStart) {
+      rafIndex = raf(function(){
+        panUpdate(e);
+      });
+    }
 
     if (moveDirectionExpected === '?') { moveDirectionExpected = getMoveDirectionExpected(); }
     if (moveDirectionExpected) {
@@ -2638,8 +2643,8 @@ export var tns = function(options) {
         if (e.type) { events.emit(isTouchEvent(e) ? 'touchMove' : 'dragMove', info(e)); }
       } catch(err) {}
 
-      var x = translateInit,
-          dist = getDist(lastPosition, initPosition);
+      var x = translateInit;
+      var dist = getDist(lastPosition, initPosition);
       if (!horizontal || fixedWidth || autoWidth) {
         x += dist;
         x += 'px';
@@ -2690,16 +2695,22 @@ export var tns = function(options) {
                 index += indexMoved;
               }
             } else {
-              var moved = - (translateInit + dist);
+              let sign = -1;
+              if (textDirection === 'rtl' && autoWidth) {
+                sign = 1;
+              }
+              var moved = sign * (translateInit + dist);
               if (moved <= 0) {
                 index = indexMin;
-              } else if (moved >= slidePositions[slideCountNew - 1]) {
+              } else if (moved >= -sign * slidePositions[slideCountNew - 1]) {
                 index = indexMax;
               } else {
                 var i = 0;
-                while (i < slideCountNew && moved >= slidePositions[i]) {
+                while (i < slideCountNew && moved >= -sign * slidePositions[i]) {
                   index = i;
-                  if (moved > slidePositions[i] && dist < 0) { index += 1; }
+                  if (moved > -sign * slidePositions[i] && dist < 0) {
+                    index += 1;
+                  }
                   i++;
                 }
               }
