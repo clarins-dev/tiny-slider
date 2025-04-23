@@ -2696,7 +2696,7 @@ export var tns = function(options) {
               }
             } else {
               let sign = -1;
-              if (textDirection === 'rtl' && autoWidth) {
+              if (textDirection === 'rtl' && autoWidth && horizontal) {
                 sign = 1;
               }
               var moved = sign * (translateInit + dist);
