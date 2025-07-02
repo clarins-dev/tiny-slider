@@ -64,6 +64,9 @@ export var tns = function(options) {
     gutter: 0,
     edgePadding: 0,
     fixedWidth: false,
+	freeScroll: false,
+	fixedWidthCenter: false,
+	cutEndPadding: false,
     autoWidth: false,
     viewportMax: false,
     slideBy: 1,
@@ -612,6 +615,10 @@ export var tns = function(options) {
 
   function getInnerWrapperStyles (edgePaddingTem, gutterTem, fixedWidthTem, speedTem, autoHeightBP) {
     var str = '';
+	var cutEndPadding = getOption('cutEndPadding');
+	if (cutEndPadding) {
+		return str;
+	}
 
     if (edgePaddingTem !== undefined) {
       var gap = edgePaddingTem;
@@ -631,7 +638,13 @@ export var tns = function(options) {
 
   function getContainerWidth (fixedWidthTem, gutterTem, itemsTem) {
     if (fixedWidthTem) {
-      return (fixedWidthTem + gutterTem) * slideCountNew + 'px';
+		var cutEndPadding = getOption('cutEndPadding');
+		var result = (fixedWidthTem + gutterTem) * slideCountNew + 'px';
+		if (cutEndPadding) {
+			result = ((fixedWidthTem + gutterTem) * slideCountNew) - gutterTem + 'px';
+		}
+
+      	return result;
     } else {
       return CALC ?
         CALC + '(' + slideCountNew * 100 + '% / ' + itemsTem + ')' :
@@ -639,17 +652,30 @@ export var tns = function(options) {
     }
   }
 
-  function getSlideWidthStyle (fixedWidthTem, gutterTem, itemsTem) {
+  function getSlideWidthStyle (fixedWidthTem, gutterTem, itemsTem, includeGutter = true) {
     var width;
-
+	var cutEndPadding = getOption('cutEndPadding');
     if (fixedWidthTem) {
       width = (fixedWidthTem + gutterTem) + 'px';
+
+	  if (cutEndPadding && !includeGutter) {
+		width = fixedWidthTem + 'px';
+	  }
     } else {
       if (!carousel) { itemsTem = Math.floor(itemsTem); }
-      var dividend = carousel ? slideCountNew : itemsTem;
-      width = CALC ?
-        CALC + '(100% / ' + dividend + ')' :
-        100 / dividend + '%';
+      	var dividend = carousel ? slideCountNew : itemsTem;
+		width = CALC ?
+			CALC + '(100% / ' + dividend + ')' :
+			100 / dividend + '%';
+
+
+		if (cutEndPadding) {
+			width = '100%';
+
+			if (!includeGutter) {
+				width = 'calc(100% - ' + gutterTem + 'px)';
+			}
+		}
     }
 
     width = 'width:' + width;
@@ -915,13 +941,26 @@ export var tns = function(options) {
 
       // slide styles
       str = horizontal && !autoWidth ? getSlideWidthStyle(options.fixedWidth, options.gutter, options.items) : '';
+
       if (options.gutter) { str += getSlideGutterStyle(options.gutter); }
       // set gallery items transition-duration
       if (!carousel) {
         if (TRANSITIONDURATION) { str += getTransitionDurationStyle(speed); }
         if (ANIMATIONDURATION) { str += getAnimationDurationStyle(speed); }
       }
-      if (str) { addCSSRule(sheet, '#' + slideId + ' > .tns-item', str, getCssRulesLength(sheet)); }
+      if (str) {
+		addCSSRule(sheet, '#' + slideId + ' > .tns-item', str, getCssRulesLength(sheet));
+		var cutEndPadding = getOption('cutEndPadding');
+		if (fixedWidth && cutEndPadding) {
+			var strLast = horizontal && !autoWidth ? getSlideWidthStyle(options.fixedWidth, 0, options.items) : '';
+			strLast += getSlideGutterStyle(0);
+			if (textDirection === 'rtl') {
+				addCSSRule(sheet, '#' + slideId + ' > .tns-item:first-child', strLast, getCssRulesLength(sheet));
+			} else {
+				addCSSRule(sheet, '#' + slideId + ' > .tns-item:last-child', strLast, getCssRulesLength(sheet));
+			}
+		}
+	}
 
     // non CSS mediaqueries: IE8
     // ## update inner wrapper, container, slides if needed
@@ -999,13 +1038,28 @@ export var tns = function(options) {
           if (TRANSITIONDURATION) { slideStr += getTransitionDurationStyle(speedBP); }
           if (ANIMATIONDURATION) { slideStr += getAnimationDurationStyle(speedBP); }
         }
-        if (slideStr) { slideStr = '#' + slideId + ' > .tns-item{' + slideStr + '}'; }
+        if (slideStr) {
+			slideStr = '#' + slideId + ' > .tns-item{' + slideStr + '}';
+		}
 
         // add up
         str = middleWrapperStr + innerWrapperStr + containerStr + slideStr;
 
         if (str) {
-          sheet.insertRule('@media (min-width: ' + bp / 16 + 'em) {' + str + '}', sheet.cssRules.length);
+          	sheet.insertRule('@media (min-width: ' + bp / 16 + 'em) {' + str + '}', sheet.cssRules.length);
+		  	var cutEndPadding = getOption('cutEndPadding');
+		  	if ('fixedWidth' in opts && cutEndPadding) {
+				var strLast = getSlideGutterStyle(0);
+				strLast += getSlideWidthStyle(fixedWidthBP, gutterBP, itemsBP, false);
+				if (textDirection === 'rtl') {
+					strLast = '#' + slideId + ' > .tns-item:first-child{' + strLast + '}';
+				} else {
+					strLast = '#' + slideId + ' > .tns-item:last-child{' + strLast + '}';
+				}
+
+				strLast = middleWrapperStr + innerWrapperStr + containerStr + strLast;
+				sheet.insertRule('@media (min-width: ' + bp / 16 + 'em) {' + strLast + '}', sheet.cssRules.length);
+			}
         }
       }
     }
@@ -2088,7 +2142,14 @@ export var tns = function(options) {
   }
 
   function getSliderWidth () {
-    return fixedWidth ? (fixedWidth + gutter) * slideCountNew : slidePositions[slideCountNew];
+	var result = fixedWidth ? (fixedWidth + gutter) * slideCountNew : slidePositions[slideCountNew];
+	var cutEndPadding = getOption('cutEndPadding');
+
+	if (cutEndPadding) {
+		result = fixedWidth ? ((fixedWidth + gutter) * slideCountNew - gutter) : slidePositions[slideCountNew];
+	}
+
+    return result;
   }
 
   function getCenterGap (num) {
@@ -2124,7 +2185,11 @@ export var tns = function(options) {
     if (horizontal && !autoWidth) {
       if (fixedWidth) {
         val = - (fixedWidth + gutter) * num;
-        if (center) { val += getCenterGap(); }
+		var currentSlide = getCurrentSlide();
+		var fixedWidthCenter = getOption('fixedWidthCenter');
+        if (center || (fixedWidthCenter && currentSlide >= 2)) {
+			 val += getCenterGap();
+		}
       } else {
         var denominator = TRANSFORM ? slideCountNew : items;
         if (center) { num -= getCenterGap(); }
@@ -2154,7 +2219,13 @@ export var tns = function(options) {
     if (textDirection === 'rtl' && val.charAt(0) === '-') {
       val = val.substr(1)
     }
-    container.style[transformAttr] = transformPrefix + val + transformPostfix;
+
+	var freeScroll = getOption('freeScroll');
+	if (!freeScroll) {
+		container.style[transformAttr] = transformPrefix + val + transformPostfix;
+	} else {
+		addClass(container, 'free-scroll-slider');
+	}
   }
 
   function animateSlide (number, classOut, classIn, isOut) {
