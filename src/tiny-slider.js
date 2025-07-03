@@ -1039,8 +1039,8 @@ export var tns = function(options) {
           if (ANIMATIONDURATION) { slideStr += getAnimationDurationStyle(speedBP); }
         }
         if (slideStr) {
-			slideStr = '#' + slideId + ' > .tns-item{' + slideStr + '}';
-		}
+	   slideStr = '#' + slideId + ' > .tns-item{' + slideStr + '}';
+	}
 
         // add up
         str = middleWrapperStr + innerWrapperStr + containerStr + slideStr;
