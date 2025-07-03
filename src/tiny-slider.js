@@ -64,9 +64,9 @@ export var tns = function(options) {
     gutter: 0,
     edgePadding: 0,
     fixedWidth: false,
-	freeScroll: false,
-	fixedWidthCenter: false,
-	cutEndPadding: false,
+    freeScroll: false,
+    fixedWidthCenter: false,
+    cutEndPadding: false,
     autoWidth: false,
     viewportMax: false,
     slideBy: 1,
@@ -615,10 +615,10 @@ export var tns = function(options) {
 
   function getInnerWrapperStyles (edgePaddingTem, gutterTem, fixedWidthTem, speedTem, autoHeightBP) {
     var str = '';
-	var cutEndPadding = getOption('cutEndPadding');
-	if (cutEndPadding) {
-		return str;
-	}
+    var cutEndPadding = getOption('cutEndPadding');
+    if (cutEndPadding) {
+	return str;
+    }
 
     if (edgePaddingTem !== undefined) {
       var gap = edgePaddingTem;
@@ -638,11 +638,11 @@ export var tns = function(options) {
 
   function getContainerWidth (fixedWidthTem, gutterTem, itemsTem) {
     if (fixedWidthTem) {
-		var cutEndPadding = getOption('cutEndPadding');
-		var result = (fixedWidthTem + gutterTem) * slideCountNew + 'px';
-		if (cutEndPadding) {
-			result = ((fixedWidthTem + gutterTem) * slideCountNew) - gutterTem + 'px';
-		}
+	var cutEndPadding = getOption('cutEndPadding');
+	var result = (fixedWidthTem + gutterTem) * slideCountNew + 'px';
+	if (cutEndPadding) {
+	   result = ((fixedWidthTem + gutterTem) * slideCountNew) - gutterTem + 'px';
+	}
 
       	return result;
     } else {
@@ -654,13 +654,13 @@ export var tns = function(options) {
 
   function getSlideWidthStyle (fixedWidthTem, gutterTem, itemsTem, includeGutter = true) {
     var width;
-	var cutEndPadding = getOption('cutEndPadding');
+    var cutEndPadding = getOption('cutEndPadding');
     if (fixedWidthTem) {
       width = (fixedWidthTem + gutterTem) + 'px';
 
-	  if (cutEndPadding && !includeGutter) {
-		width = fixedWidthTem + 'px';
-	  }
+      if (cutEndPadding && !includeGutter) {
+         width = fixedWidthTem + 'px';
+      }
     } else {
       if (!carousel) { itemsTem = Math.floor(itemsTem); }
       	var dividend = carousel ? slideCountNew : itemsTem;
@@ -669,13 +669,13 @@ export var tns = function(options) {
 			100 / dividend + '%';
 
 
-		if (cutEndPadding) {
-			width = '100%';
+	if (cutEndPadding) {
+	   width = '100%';
 
-			if (!includeGutter) {
-				width = 'calc(100% - ' + gutterTem + 'px)';
-			}
-		}
+	   if (!includeGutter) {
+	      width = 'calc(100% - ' + gutterTem + 'px)';
+	   }
+	}
     }
 
     width = 'width:' + width;
@@ -949,17 +949,17 @@ export var tns = function(options) {
         if (ANIMATIONDURATION) { str += getAnimationDurationStyle(speed); }
       }
       if (str) {
-		addCSSRule(sheet, '#' + slideId + ' > .tns-item', str, getCssRulesLength(sheet));
-		var cutEndPadding = getOption('cutEndPadding');
-		if (fixedWidth && cutEndPadding) {
-			var strLast = horizontal && !autoWidth ? getSlideWidthStyle(options.fixedWidth, 0, options.items) : '';
-			strLast += getSlideGutterStyle(0);
-			if (textDirection === 'rtl') {
-				addCSSRule(sheet, '#' + slideId + ' > .tns-item:first-child', strLast, getCssRulesLength(sheet));
-			} else {
-				addCSSRule(sheet, '#' + slideId + ' > .tns-item:last-child', strLast, getCssRulesLength(sheet));
-			}
-		}
+	 addCSSRule(sheet, '#' + slideId + ' > .tns-item', str, getCssRulesLength(sheet));
+	 var cutEndPadding = getOption('cutEndPadding');
+	 if (fixedWidth && cutEndPadding) {
+	   var strLast = horizontal && !autoWidth ? getSlideWidthStyle(options.fixedWidth, 0, options.items) : '';
+	   strLast += getSlideGutterStyle(0);
+	   if (textDirection === 'rtl') {
+	      addCSSRule(sheet, '#' + slideId + ' > .tns-item:first-child', strLast, getCssRulesLength(sheet));
+	   } else {
+	      addCSSRule(sheet, '#' + slideId + ' > .tns-item:last-child', strLast, getCssRulesLength(sheet));
+	   }
+	 }
 	}
 
     // non CSS mediaqueries: IE8
@@ -1046,20 +1046,20 @@ export var tns = function(options) {
         str = middleWrapperStr + innerWrapperStr + containerStr + slideStr;
 
         if (str) {
-          	sheet.insertRule('@media (min-width: ' + bp / 16 + 'em) {' + str + '}', sheet.cssRules.length);
-		  	var cutEndPadding = getOption('cutEndPadding');
-		  	if ('fixedWidth' in opts && cutEndPadding) {
-				var strLast = getSlideGutterStyle(0);
-				strLast += getSlideWidthStyle(fixedWidthBP, gutterBP, itemsBP, false);
-				if (textDirection === 'rtl') {
-					strLast = '#' + slideId + ' > .tns-item:first-child{' + strLast + '}';
-				} else {
-					strLast = '#' + slideId + ' > .tns-item:last-child{' + strLast + '}';
-				}
+           sheet.insertRule('@media (min-width: ' + bp / 16 + 'em) {' + str + '}', sheet.cssRules.length);
+	   var cutEndPadding = getOption('cutEndPadding');
+	   if ('fixedWidth' in opts && cutEndPadding) {
+		var strLast = getSlideGutterStyle(0);
+		strLast += getSlideWidthStyle(fixedWidthBP, gutterBP, itemsBP, false);
+		if (textDirection === 'rtl') {
+		   strLast = '#' + slideId + ' > .tns-item:first-child{' + strLast + '}';
+		} else {
+		   strLast = '#' + slideId + ' > .tns-item:last-child{' + strLast + '}';
+		}
 
-				strLast = middleWrapperStr + innerWrapperStr + containerStr + strLast;
-				sheet.insertRule('@media (min-width: ' + bp / 16 + 'em) {' + strLast + '}', sheet.cssRules.length);
-			}
+		strLast = middleWrapperStr + innerWrapperStr + containerStr + strLast;
+		sheet.insertRule('@media (min-width: ' + bp / 16 + 'em) {' + strLast + '}', sheet.cssRules.length);
+	   }
         }
       }
     }
@@ -2146,7 +2146,7 @@ export var tns = function(options) {
 	var cutEndPadding = getOption('cutEndPadding');
 
 	if (cutEndPadding) {
-		result = fixedWidth ? ((fixedWidth + gutter) * slideCountNew - gutter) : slidePositions[slideCountNew];
+	   result = fixedWidth ? ((fixedWidth + gutter) * slideCountNew - gutter) : slidePositions[slideCountNew];
 	}
 
     return result;
@@ -2185,11 +2185,11 @@ export var tns = function(options) {
     if (horizontal && !autoWidth) {
       if (fixedWidth) {
         val = - (fixedWidth + gutter) * num;
-		var currentSlide = getCurrentSlide();
-		var fixedWidthCenter = getOption('fixedWidthCenter');
+	var currentSlide = getCurrentSlide();
+	var fixedWidthCenter = getOption('fixedWidthCenter');
         if (center || (fixedWidthCenter && currentSlide >= 2)) {
-			 val += getCenterGap();
-		}
+	   val += getCenterGap();
+	}
       } else {
         var denominator = TRANSFORM ? slideCountNew : items;
         if (center) { num -= getCenterGap(); }
@@ -2220,12 +2220,12 @@ export var tns = function(options) {
       val = val.substr(1)
     }
 
-	var freeScroll = getOption('freeScroll');
-	if (!freeScroll) {
-		container.style[transformAttr] = transformPrefix + val + transformPostfix;
-	} else {
-		addClass(container, 'free-scroll-slider');
-	}
+    var freeScroll = getOption('freeScroll');
+    if (!freeScroll) {
+	container.style[transformAttr] = transformPrefix + val + transformPostfix;
+    } else {
+	addClass(container, 'free-scroll-slider');
+    }
   }
 
   function animateSlide (number, classOut, classIn, isOut) {
