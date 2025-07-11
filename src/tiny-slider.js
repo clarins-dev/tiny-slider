@@ -2142,14 +2142,7 @@ export var tns = function(options) {
   }
 
   function getSliderWidth () {
-	var result = fixedWidth ? (fixedWidth + gutter) * slideCountNew : slidePositions[slideCountNew];
-	var cutEndPadding = getOption('cutEndPadding');
-
-	if (cutEndPadding) {
-	   result = fixedWidth ? ((fixedWidth + gutter) * slideCountNew - gutter) : slidePositions[slideCountNew];
-	}
-
-    return result;
+    return fixedWidth ? (fixedWidth + gutter) * slideCountNew : slidePositions[slideCountNew];
   }
 
   function getCenterGap (num) {
@@ -2185,11 +2178,15 @@ export var tns = function(options) {
     if (horizontal && !autoWidth) {
       if (fixedWidth) {
         val = - (fixedWidth + gutter) * num;
-	var currentSlide = getCurrentSlide();
-	var fixedWidthCenter = getOption('fixedWidthCenter');
+        var currentSlide = getCurrentSlide();
+        var fixedWidthCenter = getOption('fixedWidthCenter');
         if (center || (fixedWidthCenter && currentSlide >= 2)) {
-	   val += getCenterGap();
-	}
+          if (!center && items > 2) {
+            val = - (fixedWidth + gutter) * (num + 1);
+          }
+
+          val += getCenterGap();
+        }
       } else {
         var denominator = TRANSFORM ? slideCountNew : items;
         if (center) { num -= getCenterGap(); }
@@ -2202,7 +2199,16 @@ export var tns = function(options) {
       }
     }
 
-    if (hasRightDeadZone) { val = Math.max(val, rightBoundary); }
+    if (hasRightDeadZone) {
+      var currentSlide = getCurrentSlide();
+      var cutEndPadding = getOption('cutEndPadding');
+      var isLastSlide = currentSlide === (slideCount - (items > 2 ? items - 1 : 0));
+      if (cutEndPadding && isLastSlide) {
+	    val = rightBoundary + gutter;
+      } else {
+	    val = Math.max(val, rightBoundary);
+      }
+    }
 
     val += (horizontal && !autoWidth && !fixedWidth) ? '%' : 'px';
 
