@@ -2170,7 +2170,12 @@ export var tns = function(options) {
 
     return result;
   }
-
+	
+  function isLastSlide () {
+    var currentSlide = getCurrentSlide();
+    return currentSlide === (slideCount - (items > 2 ? items - 1 : 0));
+  }
+	
   function getContainerTransformValue (num) {
     if (num == null) { num = index; }
 
@@ -2200,10 +2205,9 @@ export var tns = function(options) {
     }
 
     if (hasRightDeadZone) {
-      var currentSlide = getCurrentSlide();
       var cutEndPadding = getOption('cutEndPadding');
-      var isLastSlide = currentSlide === (slideCount - (items > 2 ? items - 1 : 0));
-      if (cutEndPadding && isLastSlide) {
+      var lastSlide = isLastSlide();
+      if (cutEndPadding && lastSlide) {
 	    val = rightBoundary + gutter;
       } else {
 	    val = Math.max(val, rightBoundary);
