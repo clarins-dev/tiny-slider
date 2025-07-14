@@ -2230,7 +2230,7 @@ export var tns = function(options) {
     if (!freeScroll) {
 	container.style[transformAttr] = transformPrefix + val + transformPostfix;
     } else {
-	addClass(container, 'free-scroll-slider');
+	fixedWidth && addClass(container, 'free-scroll-slider');
     }
   }
 
